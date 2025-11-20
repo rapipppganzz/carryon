@@ -1,11 +1,17 @@
 #!/usr/bin/env python3 import asyncio import time import sys import json
-import threading import subprocess import random from datetime import
-datetime from bleak import BleakScanner, BleakClient import bluetooth as
-bt from bluetooth import BluetoothSocket, RFCOMM import numpy as np
-import pyaudio import os import signal
+import threading
+import subprocess
+import random
+from datetime import datetime
+from bleak import BleakScanner, BleakClient
+import bluetooth as bt
+from bluetooth import BluetoothSocket, RFCOMM
+import numpy as np
+import pyaudio
+import os
+import signal
 
-from scapy.all import * # ⬅️ taro ini di sini
-
+from scapy.all import *
 class WirelessSecurityTester: def init(self): self.testing = False
 self.active_attacks = { 'bluetooth_flood': False, 'wifi_jamming': False,
 'probe_flood': False, 'ultrasonic': False }
