@@ -1,32 +1,15 @@
-#!/usr/bin/env python3
-import asyncio
-import time
-import sys
-import json
-import threading
-import subprocess
-import random
-from datetime import datetime
-from bleak import BleakScanner, BleakClient
-import bluetooth as bt
-from bluetooth import BluetoothSocket, RFCOMM
-import numpy as np
-import pyaudio
-import os
-import signal
+#!/usr/bin/env python3 import asyncio import time import sys import json
+import threading import subprocess import random from datetime import
+datetime from bleak import BleakScanner, BleakClient import bluetooth as
+bt from bluetooth import BluetoothSocket, RFCOMM import numpy as np
+import pyaudio import os import signal
 
-from scapy.all import *   # ⬅️ taro ini di sini
+from scapy.all import * # ⬅️ taro ini di sini
 
-class WirelessSecurityTester:
-    def __init__(self):
-        self.testing = False
-        self.active_attacks = {
-            'bluetooth_flood': False,
-            'wifi_jamming': False,
-            'probe_flood': False,
-            'ultrasonic': False
-        }
-        
+class WirelessSecurityTester: def init(self): self.testing = False
+self.active_attacks = { ‘bluetooth_flood’: False, ‘wifi_jamming’: False,
+‘probe_flood’: False, ‘ultrasonic’: False }
+
         self.results = {
             'vulnerabilities_found': [],
             'devices_tested': 0,
@@ -57,7 +40,7 @@ class WirelessSecurityTester:
         print(f"{color}{log_entry}\033[0m")
 
     # ===== BLUETOOTH FLOOD ATTACK (LONG DURATION) =====
-    
+
     async def bluetooth_flood_attack_extended(self, target_address, duration_minutes=60):
         """Bluetooth Flood Attack dengan durasi panjang"""
         self.log(f"Memulai Extended Bluetooth Flood Attack ke {target_address} selama {duration_minutes} menit", "WARNING")
@@ -113,7 +96,7 @@ class WirelessSecurityTester:
         return False
 
     # ===== WI-FI JAMMING / DEAUTHENTICATION ATTACK =====
-    
+
     def wifi_deauth_attack(self, interface="wlan0", target_bssid=None, duration_minutes=30):
         """Wi-Fi Deauthentication Attack (Jamming)"""
         self.log(f"📡 Memulai Wi-Fi Deauth Attack selama {duration_minutes} menit pada interface {interface}", "WARNING")
@@ -164,7 +147,7 @@ class WirelessSecurityTester:
         return thread
 
     # ===== PROBE REQUEST FLOOD ATTACK =====
-    
+
     def probe_request_flood(self, interface="wlan0", duration_minutes=30):
         """Probe Request Flood Attack"""
         self.log(f"🌐 Memulai Probe Request Flood Attack selama {duration_minutes} menit", "WARNING")
@@ -220,7 +203,7 @@ class WirelessSecurityTester:
         return thread
 
     # ===== ULTRASONIC INTERFERENCE =====
-    
+
     def ultrasonic_interference_extended(self, duration_minutes=30):
         """Extended Ultrasonic Interference Test"""
         self.log(f" Memulai Extended Ultrasonic Interference selama {duration_minutes} menit", "WARNING")
@@ -276,7 +259,7 @@ class WirelessSecurityTester:
         return thread
 
     # ===== COMPREHENSIVE ATTACK LAUNCHER =====
-    
+
     def launch_comprehensive_attack(self, attack_config):
         """Launch comprehensive wireless attacks berdasarkan config"""
         self.log("MEMULAI COMPREHENSIVE WIRELESS ATTACK", "WARNING")
@@ -440,7 +423,7 @@ class WirelessSecurityTester:
             print(f"   ✅ {rec}")
 
     # ===== INTERACTIVE MENU =====
-    
+
     def interactive_menu(self):
         """Interactive menu untuk comprehensive testing"""
         while True:
@@ -572,16 +555,11 @@ class WirelessSecurityTester:
         if self.results['vulnerabilities_found']:
             print(f"\nVulnerabilities Found: {len(self.results['vulnerabilities_found'])}")
 
-def main():
-    """Main function"""
-    print("\033[1;36m")
-    print("="*80)
-    print("📡 COMPREHENSIVE WIRELESS SECURITY TESTING TOOL")
-    print("PT Abadi Nan Jaya Network for Home")
-    print("Bluetooth Flood + WiFi Jamming + Probe Request Flood")
-    print("="*80)
-    print("\033[0m")
-    
+def main(): “““Main function”“” print(“\033[1;36m”) print(“=”80)
+print(“📡 COMPREHENSIVE WIRELESS SECURITY TESTING TOOL”) print(“PT Abadi
+Nan Jaya Network for Home”) print(“Bluetooth Flood + WiFi Jamming +
+Probe Request Flood”) print(“=”80) print(“\033[0m”)
+
     # Check dependencies
     try:
         import bleak
@@ -592,27 +570,26 @@ def main():
         print("Error: Dependencies tidak terinstall.")
         print("Install dengan: pip install bleak pyaudio numpy scapy")
         sys.exit(1)
-    
+
     # Check if running as root (required for WiFi attacks)
     if os.geteuid() != 0:
         print("⚠️  Warning: Run as root for full WiFi functionality")
         print("   Some features may not work properly")
-    
+
     tester = WirelessSecurityTester()
-    
+
     # Setup signal handler for graceful shutdown
     def signal_handler(sig, frame):
         print("\n\n🛑 Received shutdown signal...")
         tester.stop_all_attacks()
         sys.exit(0)
-    
+
     signal.signal(signal.SIGINT, signal_handler)
-    
+
     try:
         tester.interactive_menu()
     except Exception as e:
         print(f"Error: {str(e)}")
         tester.stop_all_attacks()
 
-if __name__ == "__main__":
-    main()
+if name == “main”: main()
