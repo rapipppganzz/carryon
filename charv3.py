@@ -11,13 +11,9 @@ import pyaudio
 import os
 import signal
 
-from scapy.all import *
 class WirelessSecurityTester:
     def __init__(self):
         self.testing = False
-self.active_attacks = { 'bluetooth_flood': False, 'wifi_jamming': False,
-'probe_flood': False, 'ultrasonic': False }
-
         self.results = {
             'vulnerabilities_found': [],
             'devices_tested': 0,
@@ -27,6 +23,8 @@ self.active_attacks = { 'bluetooth_flood': False, 'wifi_jamming': False,
             'start_time': None,
             'end_time': None
         }
+self.active_attacks = { 'bluetooth_flood': False, 'wifi_jamming': False,
+'probe_flood': False, 'ultrasonic': False }
         
         self.target_devices = []
         self.log_entries = []
